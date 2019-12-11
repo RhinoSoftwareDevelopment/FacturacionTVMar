@@ -5,6 +5,7 @@ class Factura:
     estado: str
     nombre: str
     direccion: str
-    saldo_anterior: str
-    saldo_actual: str
+    saldo_anterior: int
+    saldo_actual: int
     saldo_otros: str
+    base: int

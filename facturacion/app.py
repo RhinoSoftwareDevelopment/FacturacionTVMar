@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from facturacion.entities import Factura
+from facturacion.repositorio import RepositorioFaturas
 
 if __name__ == '__main__':
     load_dotenv()  #  Loads environment variables.
@@ -18,20 +19,17 @@ if __name__ == '__main__':
 
     db = pymysql.connect(host, user, password, schema)
 
-    cursor = db.cursor()
+    repositorio = RepositorioFaturas(bd=db)
 
-    sql = '''
-    SELECT tvmar.clientes.idcontrato, tvmar.clientes.estado, tvmar.clientes.nombre, tvmar.clientes.direccion, 
-    tvmar.pagos.anterior, tvmar.pagos.actual, tvmar.pagos.otros 
-    FROM tvmar.pagos JOIN tvmar.clientes ON tvmar.pagos.idcontrato = tvmar.clientes.idcontrato
-    WHERE tvmar.clientes.estado='activo' OR tvmar.clientes.estado='suspendido'
-    '''
+    facturas = repositorio.buscar_todas_las_facturas()
 
-    cursor.execute(sql)
+    print(facturas[0])
 
-    rows = cursor.fetchall()
-    facturas = [Factura(*row) for row in rows]
-
-    print(facturas)
+    repositorio.crear_factura(
+        factura=facturas[0],
+        mes_a_facturar='Noviembre',
+        fecha_limite='11/20/2019',
+        fecha_suspenseion='11/20/2019'
+    )
 
     db.close()
