@@ -1,7 +1,7 @@
+import os
 from datetime import datetime
 
 import pymysql
-import os
 from dotenv import load_dotenv
 
 from facturacion.constantes import MES
@@ -30,14 +30,6 @@ if __name__ == '__main__':
     fecha_limite = datetime(fecha_actual.year, fecha_actual.month, 17)
     fecha_corte = datetime(fecha_actual.year, fecha_actual.month, 27)
 
-    # print(facturas[0])
-    #
-    # repositorio.crear_factura(
-    #     factura=facturas[0],
-    #     mes_a_facturar=mes_acual,
-    #     fecha_limite=fecha_limite.strftime('%d/%m/%Y'),
-    #     fecha_suspenseion=fecha_corte.strftime('%d/%m/%Y')
-    # )
 
     for factura in facturas:
         repositorio.crear_factura(
