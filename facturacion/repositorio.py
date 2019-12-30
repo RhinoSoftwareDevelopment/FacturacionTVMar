@@ -24,10 +24,13 @@ class RepositorioFaturas:
         return [Factura(*fila) for fila in filas]
 
     @staticmethod
-    def crear_factura(*, factura: Factura, mes_a_facturar: str, fecha_limite, fecha_suspenseion):
+    def crear_factura(*, factura: Factura, mes_a_facturar: str, fecha_limite, fecha_suspension):
         nombre_archivo_datos = f'{factura.id_contrato}_datos.pdf'
         nombre_archivo = f'{factura.id_contrato}.pdf'
-        nombre_archivo_imagen = f'{factura.id_contrato}.jpg'
+
+        if factura.saldo_anterior > 0:
+            fecha_limite = 'INMEDIATO'
+            fecha_suspension = 'INMEDIATO'
 
         c = canvas.Canvas(nombre_archivo_datos, pagesize=(960, 540))
         total_str = str(factura.saldo_anterior + factura.base)
@@ -40,7 +43,7 @@ class RepositorioFaturas:
 
         c.drawString(200, 318, mes_a_facturar.upper().upper())
         c.drawString(525, 318, fecha_limite.upper())
-        c.drawString(835, 318, fecha_suspenseion.upper())
+        c.drawString(835, 318, fecha_suspension.upper())
 
         c.drawString(290, 175, str(factura.base))
         c.drawString(290, 150, str(factura.saldo_anterior))
