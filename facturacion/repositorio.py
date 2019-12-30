@@ -1,5 +1,7 @@
+from pdf2image import convert_from_path
 from pymysql.connections import Connection
 import pdfrw
+import os
 from reportlab.pdfgen import canvas
 
 from facturacion.entities import Factura
@@ -9,7 +11,7 @@ class RepositorioFaturas:
     SQL_ENCONTRAR_FACTURAS = '''
     SELECT tvmar.clientes.idcontrato, tvmar.clientes.estado, tvmar.clientes.nombre, tvmar.clientes.direccion, 
     tvmar.pagos.anterior, tvmar.pagos.actual, tvmar.pagos.otros, tvmar.pagos.base
-    FROM tvmar.pagos JOIN tvmar.clientes ON tvmar.pagos.idcontrato = tvmar.clientes.idcontrato
+    FROM tvmar.pagos INNER JOIN tvmar.clientes ON tvmar.pagos.idcontrato = tvmar.clientes.idcontrato
     WHERE tvmar.clientes.estado='activo' OR tvmar.clientes.estado='suspendido'
     '''
 
@@ -23,8 +25,9 @@ class RepositorioFaturas:
 
     @staticmethod
     def crear_factura(*, factura: Factura, mes_a_facturar: str, fecha_limite, fecha_suspenseion):
-        nombre_archivo_datos = f'${factura.nombre}_datos.pdf'
-        nombre_archivo = f'${factura.nombre}.pdf'
+        nombre_archivo_datos = f'{factura.id_contrato}_datos.pdf'
+        nombre_archivo = f'{factura.id_contrato}.pdf'
+        nombre_archivo_imagen = f'{factura.id_contrato}.jpg'
 
         c = canvas.Canvas(nombre_archivo_datos, pagesize=(960, 540))
         total_str = str(factura.saldo_anterior + factura.base)
@@ -47,6 +50,7 @@ class RepositorioFaturas:
 
         c.save()
         RepositorioFaturas._merge_pdfs('template.pdf', nombre_archivo_datos, nombre_archivo)
+        os.remove(nombre_archivo_datos)
 
     @staticmethod
     def _merge_pdfs(form_pdf, overlay_pdf, output):

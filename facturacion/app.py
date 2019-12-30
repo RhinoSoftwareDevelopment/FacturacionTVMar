@@ -1,8 +1,10 @@
+from datetime import datetime
+
 import pymysql
 import os
 from dotenv import load_dotenv
 
-from facturacion.entities import Factura
+from facturacion.constantes import MES
 from facturacion.repositorio import RepositorioFaturas
 
 if __name__ == '__main__':
@@ -20,16 +22,21 @@ if __name__ == '__main__':
     db = pymysql.connect(host, user, password, schema)
 
     repositorio = RepositorioFaturas(bd=db)
-
     facturas = repositorio.buscar_todas_las_facturas()
+
+    fecha_actual = datetime.today()
+    mes_acual = MES[fecha_actual.month - 1]
+
+    fecha_limite = datetime(fecha_actual.year, fecha_actual.month, 17)
+    fecha_corte = datetime(fecha_actual.year, fecha_actual.month, 27)
 
     print(facturas[0])
 
     repositorio.crear_factura(
         factura=facturas[0],
-        mes_a_facturar='Noviembre',
-        fecha_limite='11/20/2019',
-        fecha_suspenseion='11/20/2019'
+        mes_a_facturar=mes_acual,
+        fecha_limite=fecha_limite.strftime('%d/%m/%Y'),
+        fecha_suspenseion=fecha_corte.strftime('%d/%m/%Y')
     )
 
     db.close()
